@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Failure Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS as per project guidelines -->
+    <style>
+        :root {
+            --primary-color: #2c52ff;
+            --secondary-color: #2c3e50;
+            --background-color: #7a37d1;
+            --container-bg: #ecb3ea;
+            --text-color: #131212;
+            --success-color: #0c0735;
+            --error-color: #fc1900;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        form .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        
+        .result-high-risk {
+            background-color: #fbe9e7;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .result-low-risk {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .result-container h2 {
+            margin-top: 0;
+            font-weight: 700;
+        }
+        .result-container p {
+            margin-bottom: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Heart Failure Prediction Model</h1>
+        
+        <!-- Input Form -->
+        <form action="{{ url_for('predict') }}" method="post">
+            <div class="form-grid">
+                <!-- All 12 input fields as per the dataset -->
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" step="any" name="age" placeholder="e.g., 55" required>
+                </div>
+                <div class="form-group">
+                    <label for="anaemia">Anaemia (0: No, 1: Yes)</label>
+                    <input type="number" name="anaemia" placeholder="0 or 1" required min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label for="creatinine_phosphokinase">Creatinine Phosphokinase (mcg/L)</label>
+                    <input type="number" step="any" name="creatinine_phosphokinase" placeholder="e.g., 582" required>
+                </div>
+                <div class="form-group">
+                    <label for="diabetes">Diabetes (0: No, 1: Yes)</label>
+                    <input type="number" name="diabetes" placeholder="0 or 1" required min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label for="ejection_fraction">Ejection Fraction (%)</label>
+                    <input type="number" step="any" name="ejection_fraction" placeholder="e.g., 20" required>
+                </div>
+                <div class="form-group">
+                    <label for="high_blood_pressure">High Blood Pressure (0: No, 1: Yes)</label>
+                    <input type="number" name="high_blood_pressure" placeholder="0 or 1" required min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label for="platelets">Platelets (kiloplatelets/mL)</label>
+                    <input type="number" step="any" name="platelets" placeholder="e.g., 263358.03" required>
+                </div>
+                <div class="form-group">
+                    <label for="serum_creatinine">Serum Creatinine (mg/dL)</label>
+                    <input type="number" step="any" name="serum_creatinine" placeholder="e.g., 1.83" required>
+                </div>
+                <div class="form-group">
+                    <label for="serum_sodium">Serum Sodium (mEq/L)</label>
+                    <input type="number" step="any" name="serum_sodium" placeholder="e.g., 134" required>
+                </div>
+                <div class="form-group">
+                    <label for="sex">Sex (0: Female, 1: Male)</label>
+                    <input type="number" name="sex" placeholder="0 or 1" required min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label for="smoking">Smoking (0: No, 1: Yes)</label>
+                    <input type="number" name="smoking" placeholder="0 or 1" required min="0" max="1">
+                </div>
+                <div class="form-group">
+                    <label for="time">Follow-up period (days)</label>
+                    <input type="number" step="any" name="time" placeholder="e.g., 80" required>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button type="submit" class="btn">Predict</button>
+            </div>
+        </form>
+
+        <!-- Result Display Section -->
+        {% if show_result %}
+        <div class="result-container {% if 'High Risk' in prediction_text %}result-high-risk{% else %}result-low-risk{% endif %}">
+            <h2>{{ prediction_text }}</h2>
+            <p>{{ result_details }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
